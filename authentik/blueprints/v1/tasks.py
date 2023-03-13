@@ -185,10 +185,9 @@ def apply_blueprint(self: MonitoredTask, instance_pk: str):
         if not instance or not instance.enabled:
             return
         blueprint_content = instance.retrieve()
-        file_hash = sha512(blueprint_content.encode()).hexdigest()
-        importer = Importer(blueprint_content, instance.context)
-        if importer.blueprint.metadata:
-            instance.metadata = asdict(importer.blueprint.metadata)
+        file_hash = sha512("".join(blueprint_content).encode()).hexdigest()
+        importer = Importer(*blueprint_content, context=instance.context)
+        instance.metadata = importer.metadata
         valid, logs = importer.validate()
         if not valid:
             instance.status = BlueprintInstanceStatus.ERROR
