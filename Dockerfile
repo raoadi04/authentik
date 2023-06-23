@@ -69,14 +69,14 @@ LABEL org.opencontainers.image.url https://goauthentik.io
 LABEL org.opencontainers.image.description goauthentik.io Main server image, see https://goauthentik.io for more info.
 LABEL org.opencontainers.image.source https://github.com/goauthentik/authentik
 
-WORKDIR /
+WORKDIR /app-root
 
 ARG GIT_BUILD_HASH
 ENV GIT_BUILD_HASH=$GIT_BUILD_HASH
 
-COPY --from=poetry-locker /work/requirements.txt /
-COPY --from=poetry-locker /work/requirements-dev.txt /
-COPY --from=geoip /usr/share/GeoIP /geoip
+COPY --from=poetry-locker /work/requirements.txt /app-root
+COPY --from=poetry-locker /work/requirements-dev.txt /app-root
+COPY --from=geoip /usr/share/GeoIP /app-root/geoip
 
 RUN apt-get update && \
     # Required for installing pip packages
@@ -85,35 +85,35 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends libxmlsec1-openssl libmaxminddb0 && \
     # Required for bootstrap & healtcheck
     apt-get install -y --no-install-recommends runit && \
-    pip install --no-cache-dir -r /requirements.txt && \
+    pip install --no-cache-dir -r /app-root/requirements.txt && \
     apt-get remove --purge -y build-essential pkg-config libxmlsec1-dev && \
     apt-get autoremove --purge -y && \
     apt-get clean && \
     rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/ && \
-    adduser --system --no-create-home --uid 1000 --group --home /authentik authentik && \
+    adduser --system --no-create-home --uid 1000 --group --home /app-root authentik && \
+    mkdir -p /app-root /app-root/.ssh && \
     mkdir -p /certs /media /blueprints && \
-    mkdir -p /authentik/.ssh && \
-    chown authentik:authentik /certs /media /authentik/.ssh
+    chown -R authentik:authentik /certs /media /app-root/
 
-COPY ./authentik/ /authentik
-COPY ./pyproject.toml /
-COPY ./schemas /schemas
-COPY ./locale /locale
-COPY ./tests /tests
-COPY ./manage.py /
+COPY ./authentik/ /app-root/authentik
+COPY ./pyproject.toml /app-root/
+COPY ./schemas /app-root/schemas
+COPY ./locale /app-root/locale
+COPY ./tests /app-root/tests
+COPY ./manage.py /app-root/
 COPY ./blueprints /blueprints
-COPY ./lifecycle/ /lifecycle
+COPY ./lifecycle/ /app-root/lifecycle
 COPY --from=go-builder /work/authentik /bin/authentik
-COPY --from=web-builder /work/web/dist/ /web/dist/
-COPY --from=web-builder /work/web/authentik/ /web/authentik/
-COPY --from=website-builder /work/website/help/ /website/help/
+COPY --from=web-builder /work/web/dist/ /app-root/web/dist/
+COPY --from=web-builder /work/web/authentik/ /app-root/web/authentik/
+COPY --from=website-builder /work/website/help/ /app-root/website/help/
 
 USER 1000
 
 ENV TMPDIR /dev/shm/
 ENV PYTHONUNBUFFERED 1
-ENV PATH "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/lifecycle"
+ENV PATH "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/app-root/lifecycle"
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 CMD [ "/lifecycle/ak", "healthcheck" ]
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 CMD [ "ak", "healthcheck" ]
 
-ENTRYPOINT [ "/usr/local/bin/dumb-init", "--", "/lifecycle/ak" ]
+ENTRYPOINT [ "/usr/local/bin/dumb-init", "--", "ak" ]
