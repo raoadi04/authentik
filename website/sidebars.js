@@ -260,7 +260,17 @@ const docsSidebar = {
         {
             type: "category",
             label: "Users & Groups",
-            items: ["user-group/user", "user-group/group"],
+            items: [
+                {
+                    type: "category",
+                    label: "User",
+                    items: [
+                        "user-group/user/index",
+                        "user-group/user/user_basic_operations",
+                    ],
+                },
+                "user-group/group",
+            ],
         },
         {
             type: "category",
