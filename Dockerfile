@@ -120,7 +120,7 @@ LABEL org.opencontainers.image.source https://github.com/goauthentik/authentik
 LABEL org.opencontainers.image.version ${VERSION}
 LABEL org.opencontainers.image.revision ${GIT_BUILD_HASH}
 
-WORKDIR /
+WORKDIR /ak-root
 
 # We cannot cache this layer otherwise we'll end up with a bigger image
 RUN apt-get update && \
@@ -131,33 +131,36 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/ && \
     adduser --system --no-create-home --uid 1000 --group --home /authentik authentik && \
-    mkdir -p /certs /media /blueprints && \
+    mkdir -p /data/certs /data/media /data/blueprints && \
+    mkdir -p /ak-root/blueprints && \
+    ln -s /data/blueprints /ak-root/blueprints/local && \
     mkdir -p /authentik/.ssh && \
     mkdir -p /ak-root && \
-    chown authentik:authentik /certs /media /authentik/.ssh /ak-root
+    chown authentik:authentik /data/certs /data/media /authentik/.ssh /ak-root
 
-COPY ./authentik/ /authentik
-COPY ./pyproject.toml /
-COPY ./poetry.lock /
-COPY ./schemas /schemas
-COPY ./locale /locale
-COPY ./tests /tests
-COPY ./manage.py /
-COPY ./blueprints /blueprints
-COPY ./lifecycle/ /lifecycle
+COPY ./authentik/ /ak-root/authentik
+COPY ./pyproject.toml /ak-root
+COPY ./poetry.lock /ak-root
+COPY ./schemas /ak-root/schemas
+COPY ./locale /ak-root/locale
+COPY ./tests /ak-root/tests
+COPY ./manage.py /ak-root/
+COPY ./blueprints /ak-root/blueprints
+COPY ./lifecycle/ /ak-root/lifecycle
 COPY --from=go-builder /go/authentik /bin/authentik
 COPY --from=python-deps /ak-root/venv /ak-root/venv
-COPY --from=web-builder /work/web/dist/ /web/dist/
-COPY --from=web-builder /work/web/authentik/ /web/authentik/
-COPY --from=website-builder /work/website/help/ /website/help/
-COPY --from=geoip /usr/share/GeoIP /geoip
+COPY --from=python-deps /work/venv /ak-root/venv
+COPY --from=web-builder /work/web/dist/ /ak-root/web/dist/
+COPY --from=web-builder /work/web/authentik/ /ak-root/web/authentik/
+COPY --from=website-builder /work/website/help/ /ak-root/website/help/
+COPY --from=geoip /usr/share/GeoIP /data/geoip
 
 USER 1000
 
 ENV TMPDIR=/dev/shm/ \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH="/ak-root/venv/bin:/lifecycle:$PATH" \
+    PATH="/ak-root/venv/bin:/ak-root/lifecycle:$PATH" \
     VENV_PATH="/ak-root/venv" \
     POETRY_VIRTUALENVS_CREATE=false
 
