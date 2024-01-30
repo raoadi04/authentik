@@ -33,7 +33,7 @@ class TestTokenDeviceCode(OAuthTestCase):
     def test_code_no_code(self):
         """Test code without code"""
         res = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             data={
                 "client_id": self.provider.client_id,
                 "grant_type": GRANT_TYPE_DEVICE_CODE,
@@ -51,7 +51,7 @@ class TestTokenDeviceCode(OAuthTestCase):
             device_code=generate_id(),
         )
         res = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             data={
                 "client_id": self.provider.client_id,
                 "grant_type": GRANT_TYPE_DEVICE_CODE,
@@ -71,7 +71,7 @@ class TestTokenDeviceCode(OAuthTestCase):
             user=self.user,
         )
         res = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             data={
                 "client_id": self.provider.client_id,
                 "grant_type": GRANT_TYPE_DEVICE_CODE,

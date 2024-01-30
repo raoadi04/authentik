@@ -291,13 +291,13 @@ class TestAuthorize(OAuthTestCase):
             redirect_uris="foo://localhost",
             access_code_validity="seconds=100",
         )
-        Application.objects.create(name="app", slug="app", provider=provider)
+        app = Application.objects.create(name="app", slug="app", provider=provider)
         state = generate_id()
         user = create_test_admin_user()
         self.client.force_login(user)
         # Step 1, initiate params and get redirect to flow
         self.client.get(
-            reverse("authentik_providers_oauth2:authorize"),
+            reverse("authentik_providers_oauth2:authorize", kwargs={"application_slug": app.slug}),
             data={
                 "response_type": "code",
                 "client_id": "test",
@@ -343,7 +343,7 @@ class TestAuthorize(OAuthTestCase):
                 ]
             )
         )
-        Application.objects.create(name="app", slug="app", provider=provider)
+        app = Application.objects.create(name="app", slug="app", provider=provider)
         state = generate_id()
         user = create_test_admin_user()
         self.client.force_login(user)
@@ -359,7 +359,9 @@ class TestAuthorize(OAuthTestCase):
         ):
             # Step 1, initiate params and get redirect to flow
             self.client.get(
-                reverse("authentik_providers_oauth2:authorize"),
+                reverse(
+                    "authentik_providers_oauth2:authorize", kwargs={"application_slug": app.slug}
+                ),
                 data={
                     "response_type": "id_token",
                     "client_id": "test",
@@ -405,7 +407,7 @@ class TestAuthorize(OAuthTestCase):
             redirect_uris="http://localhost",
             signing_key=self.keypair,
         )
-        Application.objects.create(name="app", slug="app", provider=provider)
+        app = Application.objects.create(name="app", slug="app", provider=provider)
         state = generate_id()
         user = create_test_admin_user()
         self.client.force_login(user)
@@ -421,7 +423,9 @@ class TestAuthorize(OAuthTestCase):
         ):
             # Step 1, initiate params and get redirect to flow
             self.client.get(
-                reverse("authentik_providers_oauth2:authorize"),
+                reverse(
+                    "authentik_providers_oauth2:authorize", kwargs={"application_slug": app.slug}
+                ),
                 data={
                     "response_type": "code",
                     "response_mode": "fragment",
@@ -476,7 +480,7 @@ class TestAuthorize(OAuthTestCase):
         self.client.force_login(user)
         # Step 1, initiate params and get redirect to flow
         self.client.get(
-            reverse("authentik_providers_oauth2:authorize"),
+            reverse("authentik_providers_oauth2:authorize", kwargs={"application_slug": app.slug}),
             data={
                 "response_type": "id_token",
                 "response_mode": "form_post",
@@ -526,7 +530,7 @@ class TestAuthorize(OAuthTestCase):
         self.client.force_login(user)
         # Step 1, initiate params and get redirect to flow
         self.client.get(
-            reverse("authentik_providers_oauth2:authorize"),
+            reverse("authentik_providers_oauth2:authorize", kwargs={"application_slug": app.slug}),
             data={
                 "response_type": "code",
                 "response_mode": "form_post",

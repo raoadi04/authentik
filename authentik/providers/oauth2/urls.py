@@ -18,26 +18,51 @@ from authentik.providers.oauth2.views.token import TokenView
 from authentik.providers.oauth2.views.token_revoke import TokenRevokeView
 from authentik.providers.oauth2.views.userinfo import UserInfoView
 
-urlpatterns = [
+urls_legacy = [
     path(
         "authorize/",
         AuthorizationFlowInitView.as_view(),
-        name="authorize",
+        name="authorize-legacy",
     ),
-    path("token/", TokenView.as_view(), name="token"),
-    path("device/", DeviceView.as_view(), name="device"),
+    path("token/", TokenView.as_view(), name="token-legacy"),
+    path("device/", DeviceView.as_view(), name="device-legacy"),
     path(
         "userinfo/",
         UserInfoView.as_view(),
-        name="userinfo",
+        name="userinfo-legacy",
     ),
     path(
         "introspect/",
         TokenIntrospectionView.as_view(),
-        name="token-introspection",
+        name="token-introspection-legacy",
     ),
     path(
         "revoke/",
+        TokenRevokeView.as_view(),
+        name="token-revoke-legacy",
+    ),
+]
+
+urlpatterns = urls_legacy + [
+    path(
+        "<slug:application_slug>/authorize/",
+        AuthorizationFlowInitView.as_view(),
+        name="authorize",
+    ),
+    path("<slug:application_slug>/token/", TokenView.as_view(), name="token"),
+    path("<slug:application_slug>/device/", DeviceView.as_view(), name="device"),
+    path(
+        "<slug:application_slug>/userinfo/",
+        UserInfoView.as_view(),
+        name="userinfo",
+    ),
+    path(
+        "<slug:application_slug>/introspect/",
+        TokenIntrospectionView.as_view(),
+        name="token-introspection",
+    ),
+    path(
+        "<slug:application_slug>/revoke/",
         TokenRevokeView.as_view(),
         name="token-revoke",
     ),

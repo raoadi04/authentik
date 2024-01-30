@@ -63,7 +63,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
     def test_invalid_type(self):
         """test invalid type"""
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
@@ -79,7 +79,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
     def test_invalid_jwt(self):
         """test invalid JWT"""
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
@@ -101,7 +101,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
             }
         )
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
@@ -123,7 +123,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
             }
         )
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
@@ -147,7 +147,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
             }
         )
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
@@ -175,7 +175,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
             }
         )
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
@@ -197,7 +197,7 @@ class TestTokenClientCredentialsJWTSource(OAuthTestCase):
             }
         )
         response = self.client.post(
-            reverse("authentik_providers_oauth2:token"),
+            reverse("authentik_providers_oauth2:token", kwargs={"application_slug": self.app.slug}),
             {
                 "grant_type": GRANT_TYPE_CLIENT_CREDENTIALS,
                 "scope": f"{SCOPE_OPENID} {SCOPE_OPENID_EMAIL} {SCOPE_OPENID_PROFILE}",
