@@ -115,6 +115,12 @@ export class AuthenticatorValidateStageForm extends BaseStageForm<AuthenticatorV
                             >
                                 ${msg("SMS-based Authenticators")}
                             </option>
+                            <option
+                                value=${DeviceClassesEnum.Mobile}
+                                ?selected=${this.isDeviceClassSelected(DeviceClassesEnum.Mobile)}
+                            >
+                                ${msg("Mobile Authenticators")}
+                            </option>
                         </select>
                         <p class="pf-c-form__helper-text">
                             ${msg("Device classes which can be used to authenticate.")}
@@ -183,33 +189,6 @@ export class AuthenticatorValidateStageForm extends BaseStageForm<AuthenticatorV
                             </option>
                         </select>
                     </ak-form-element-horizontal>
-                    <ak-form-element-horizontal
-                        label=${msg("WebAuthn User verification")}
-                        ?required=${true}
-                        name="webauthnUserVerification"
-                    >
-                        <ak-radio
-                            .options=${[
-                                {
-                                    label: msg("User verification must occur."),
-                                    value: UserVerificationEnum.Required,
-                                    default: true,
-                                },
-                                {
-                                    label: msg(
-                                        "User verification is preferred if available, but not required.",
-                                    ),
-                                    value: UserVerificationEnum.Preferred,
-                                },
-                                {
-                                    label: msg("User verification should not occur."),
-                                    value: UserVerificationEnum.Discouraged,
-                                },
-                            ]}
-                            .value=${this.instance?.webauthnUserVerification}
-                        >
-                        </ak-radio>
-                    </ak-form-element-horizontal>
                     ${this.showConfigurationStages
                         ? html`
                               <ak-form-element-horizontal
@@ -241,9 +220,39 @@ export class AuthenticatorValidateStageForm extends BaseStageForm<AuthenticatorV
                                           "When multiple stages are selected, the user can choose which one they want to enroll.",
                                       )}
                                   </p>
+                                  <p class="pf-c-form__helper-text">
+                                      ${msg("Hold control/command to select multiple items.")}
+                                  </p>
                               </ak-form-element-horizontal>
                           `
                         : html``}
+                    <ak-form-element-horizontal
+                        label=${msg("WebAuthn User verification")}
+                        ?required=${true}
+                        name="webauthnUserVerification"
+                    >
+                        <ak-radio
+                            .options=${[
+                                {
+                                    label: msg("User verification must occur."),
+                                    value: UserVerificationEnum.Required,
+                                    default: true,
+                                },
+                                {
+                                    label: msg(
+                                        "User verification is preferred if available, but not required.",
+                                    ),
+                                    value: UserVerificationEnum.Preferred,
+                                },
+                                {
+                                    label: msg("User verification should not occur."),
+                                    value: UserVerificationEnum.Discouraged,
+                                },
+                            ]}
+                            .value=${this.instance?.webauthnUserVerification}
+                        >
+                        </ak-radio>
+                    </ak-form-element-horizontal>
                 </div>
             </ak-form-group>`;
     }
