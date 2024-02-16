@@ -30811,7 +30811,8 @@ components:
         device_challenges:
           type: array
           items:
-            $ref: '#/components/schemas/DeviceChallenge'
+            $ref: '#/components/schemas/DeviceChallengeTypes'
+          readOnly: true
         configuration_stages:
           type: array
           items:
@@ -30824,25 +30825,21 @@ components:
       - type
     AuthenticatorValidationChallengeResponseRequest:
       type: object
-      description: Challenge used for Code-based and WebAuthn authenticators
+      description: Challenge wrapper for authenticator devices
       properties:
         component:
           type: string
           minLength: 1
           default: ak-stage-authenticator-validate
-        selected_challenge:
-          $ref: '#/components/schemas/DeviceChallengeRequest'
+        selected_challenge_uid:
+          type: string
+          nullable: true
+          minLength: 1
+        selected_challenge_response:
+          $ref: '#/components/schemas/DeviceChallengeResponseRequest'
         selected_stage:
           type: string
           minLength: 1
-        code:
-          type: string
-          minLength: 1
-        webauthn:
-          type: object
-          additionalProperties: {}
-        duo:
-          type: integer
     AuthenticatorWebAuthnChallenge:
       type: object
       description: WebAuthn Challenge
@@ -31860,38 +31857,36 @@ components:
       - type
       - verbose_name
       - verbose_name_plural
-    DeviceChallenge:
-      type: object
-      description: Single device challenge
-      properties:
-        device_class:
-          type: string
-        device_uid:
-          type: string
-        challenge:
-          type: object
-          additionalProperties: {}
-      required:
-      - challenge
-      - device_class
-      - device_uid
-    DeviceChallengeRequest:
-      type: object
-      description: Single device challenge
-      properties:
-        device_class:
-          type: string
-          minLength: 1
-        device_uid:
-          type: string
-          minLength: 1
-        challenge:
-          type: object
-          additionalProperties: {}
-      required:
-      - challenge
-      - device_class
-      - device_uid
+    DeviceChallengeResponseRequest:
+      oneOf:
+      - $ref: '#/components/schemas/DuoDeviceChallengeResponseRequest'
+      - $ref: '#/components/schemas/SMSDeviceChallengeResponseRequest'
+      - $ref: '#/components/schemas/StaticDeviceChallengeResponseRequest'
+      - $ref: '#/components/schemas/TOTPDeviceChallengeResponseRequest'
+      - $ref: '#/components/schemas/WebAuthnDeviceChallengeResponseRequest'
+      discriminator:
+        propertyName: component
+        mapping:
+          ak-stage-authenticator-validate-device-duo: '#/components/schemas/DuoDeviceChallengeResponseRequest'
+          ak-stage-authenticator-validate-device-sms: '#/components/schemas/SMSDeviceChallengeResponseRequest'
+          ak-stage-authenticator-validate-device-static: '#/components/schemas/StaticDeviceChallengeResponseRequest'
+          ak-stage-authenticator-validate-device-totp: '#/components/schemas/TOTPDeviceChallengeResponseRequest'
+          ak-stage-authenticator-validate-device-webauthn: '#/components/schemas/WebAuthnDeviceChallengeResponseRequest'
+    DeviceChallengeTypes:
+      oneOf:
+      - $ref: '#/components/schemas/DuoDeviceChallenge'
+      - $ref: '#/components/schemas/SMSDeviceChallenge'
+      - $ref: '#/components/schemas/StaticDeviceChallenge'
+      - $ref: '#/components/schemas/TOTPDeviceChallenge'
+      - $ref: '#/components/schemas/WebAuthnDeviceChallenge'
+      discriminator:
+        propertyName: component
+        mapping:
+          ak-stage-authenticator-validate-device-duo: '#/components/schemas/DuoDeviceChallenge'
+          ak-stage-authenticator-validate-device-sms: '#/components/schemas/SMSDeviceChallenge'
+          ak-stage-authenticator-validate-device-static: '#/components/schemas/StaticDeviceChallenge'
+          ak-stage-authenticator-validate-device-totp: '#/components/schemas/TOTPDeviceChallenge'
+          ak-stage-authenticator-validate-device-webauthn: '#/components/schemas/WebAuthnDeviceChallenge'
     DeviceClassesEnum:
       enum:
       - static
@@ -32221,6 +32216,48 @@ components:
       required:
       - name
       - pk
+    DuoDeviceChallenge:
+      type: object
+      description: Duo device challenge
+      properties:
+        type:
+          $ref: '#/components/schemas/ChallengeChoices'
+        component:
+          type: string
+          default: ak-stage-authenticator-validate-device-duo
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetail'
+        uid:
+          type: string
+        duo_txn:
+          type: string
+      required:
+      - duo_txn
+      - type
+      - uid
+    DuoDeviceChallengeResponseRequest:
+      type: object
+      description: Validate Duo device
+      properties:
+        component:
+          type: string
+          minLength: 1
+          default: ak-stage-authenticator-validate-device-duo
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetailRequest'
+        uid:
+          type: string
+          minLength: 1
+      required:
+      - uid
     DuoDeviceEnrollmentStatus:
       type: object
       properties:
@@ -32497,6 +32534,19 @@ components:
           type: string
         code:
           type: string
+      required:
+      - code
+      - string
+    ErrorDetailRequest:
+      type: object
+      description: Serializer for rest_framework's error messages
+      properties:
+        string:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
       required:
       - code
       - string
@@ -43166,6 +43216,56 @@ components:
       - name
       - phone_number
       - pk
+    SMSDeviceChallenge:
+      type: object
+      description: |-
+        Challenge for an individual device, can contain data required
+        to solve the devices' challenge
+      properties:
+        type:
+          $ref: '#/components/schemas/ChallengeChoices'
+        component:
+          type: string
+          default: ak-stage-authenticator-validate-device-sms
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetail'
+        uid:
+          type: string
+        number_preview:
+          type: string
+      required:
+      - number_preview
+      - type
+      - uid
+    SMSDeviceChallengeResponseRequest:
+      type: object
+      description: |-
+        Response to a device's challenge. May continue additional fields depending
+        of device type.
+      properties:
+        component:
+          type: string
+          minLength: 1
+          default: ak-stage-authenticator-validate-device-sms
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetailRequest'
+        uid:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - uid
     SMSDeviceRequest:
       type: object
       description: Serializer for sms authenticator devices
@@ -43751,6 +43851,53 @@ components:
       - name
       - pk
       - token_set
+    StaticDeviceChallenge:
+      type: object
+      description: |-
+        Challenge for an individual device, can contain data required
+        to solve the devices' challenge
+      properties:
+        type:
+          $ref: '#/components/schemas/ChallengeChoices'
+        component:
+          type: string
+          default: ak-stage-authenticator-validate-device-static
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetail'
+        uid:
+          type: string
+      required:
+      - type
+      - uid
+    StaticDeviceChallengeResponseRequest:
+      type: object
+      description: |-
+        Response to a device's challenge. May continue additional fields depending
+        of device type.
+      properties:
+        component:
+          type: string
+          minLength: 1
+          default: ak-stage-authenticator-validate-device-static
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetailRequest'
+        uid:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - uid
     StaticDeviceRequest:
       type: object
       description: Serializer for static authenticator devices
@@ -43938,6 +44085,53 @@ components:
       required:
       - name
       - pk
+    TOTPDeviceChallenge:
+      type: object
+      description: |-
+        Challenge for an individual device, can contain data required
+        to solve the devices' challenge
+      properties:
+        type:
+          $ref: '#/components/schemas/ChallengeChoices'
+        component:
+          type: string
+          default: ak-stage-authenticator-validate-device-totp
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetail'
+        uid:
+          type: string
+      required:
+      - type
+      - uid
+    TOTPDeviceChallengeResponseRequest:
+      type: object
+      description: |-
+        Response to a device's challenge. May continue additional fields depending
+        of device type.
+      properties:
+        component:
+          type: string
+          minLength: 1
+          default: ak-stage-authenticator-validate-device-totp
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetailRequest'
+        uid:
+          type: string
+          minLength: 1
+        code:
+          type: string
+          minLength: 1
+      required:
+      - code
+      - uid
     TOTPDeviceRequest:
       type: object
       description: Serializer for totp authenticator devices
@@ -45222,6 +45416,57 @@ components:
       - created_on
       - name
       - pk
+    WebAuthnDeviceChallenge:
+      type: object
+      description: |-
+        Challenge for an individual device, can contain data required
+        to solve the devices' challenge
+      properties:
+        type:
+          $ref: '#/components/schemas/ChallengeChoices'
+        component:
+          type: string
+          default: ak-stage-authenticator-validate-device-webauthn
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetail'
+        uid:
+          type: string
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - type
+      - uid
+    WebAuthnDeviceChallengeResponseRequest:
+      type: object
+      description: |-
+        Response to a device's challenge. May continue additional fields depending
+        of device type.
+      properties:
+        component:
+          type: string
+          minLength: 1
+          default: ak-stage-authenticator-validate-device-webauthn
+        response_errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/ErrorDetailRequest'
+        uid:
+          type: string
+          minLength: 1
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - uid
     WebAuthnDeviceRequest:
       type: object
       description: Serializer for WebAuthn authenticator devices
