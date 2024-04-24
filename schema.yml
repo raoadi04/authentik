@@ -31856,6 +31856,10 @@ components:
           type: string
           description: Domain that activates this brand. Can be a superset, i.e. `a.b`
             for `aa.b` and `ba.b`
+        origin:
+          type: string
+          description: Origin domain that activates this brand. Can be left empty
+            to not allow any origins.
         default:
           type: boolean
         branding_title:
@@ -31888,6 +31892,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        default_application:
+          type: string
+          format: uuid
+          nullable: true
+          description: When set, external users will be redirected to this application
+            after authenticating.
         web_certificate:
           type: string
           format: uuid
@@ -31906,6 +31916,10 @@ components:
           minLength: 1
           description: Domain that activates this brand. Can be a superset, i.e. `a.b`
             for `aa.b` and `ba.b`
+        origin:
+          type: string
+          description: Origin domain that activates this brand. Can be left empty
+            to not allow any origins.
         default:
           type: boolean
         branding_title:
@@ -31941,6 +31955,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        default_application:
+          type: string
+          format: uuid
+          nullable: true
+          description: When set, external users will be redirected to this application
+            after authenticating.
         web_certificate:
           type: string
           format: uuid
@@ -38479,6 +38499,10 @@ components:
           minLength: 1
           description: Domain that activates this brand. Can be a superset, i.e. `a.b`
             for `aa.b` and `ba.b`
+        origin:
+          type: string
+          description: Origin domain that activates this brand. Can be left empty
+            to not allow any origins.
         default:
           type: boolean
         branding_title:
@@ -38514,6 +38538,12 @@ components:
           type: string
           format: uuid
           nullable: true
+        default_application:
+          type: string
+          format: uuid
+          nullable: true
+          description: When set, external users will be redirected to this application
+            after authenticating.
         web_certificate:
           type: string
           format: uuid
