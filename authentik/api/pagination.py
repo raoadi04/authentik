@@ -3,6 +3,8 @@
 from rest_framework import pagination
 from rest_framework.response import Response
 
+from authentik.api.search import AUTOCOMPLETE_COMPONENT_NAME, JSONDjangoQLSchemaSerializer, QLSearch
+
 PAGINATION_COMPONENT_NAME = "Pagination"
 PAGINATION_SCHEMA = {
     "type": "object",
@@ -47,6 +49,21 @@ class Pagination(pagination.PageNumberPagination):
     page_query_param = "page"
     page_size_query_param = "page_size"
 
+    view = None
+
+    def paginate_queryset(self, queryset, request, view=None):
+        self.view = view
+        return super().paginate_queryset(queryset, request, view=view)
+
+    def get_autocomplete(self):
+        if QLSearch not in getattr(self.view, "filter_backends", []):
+            return {}
+        schema = QLSearch().get_schema(self.request, self.view)
+        introspections = JSONDjangoQLSchemaSerializer().serialize(
+            schema(self.page.paginator.object_list.model),
+        )
+        return introspections
+
     def get_paginated_response(self, data):
         previous_page_number = 0
         if self.page.has_previous():
@@ -66,11 +83,12 @@ class Pagination(pagination.PageNumberPagination):
                     "end_index": self.page.end_index(),
                 },
                 "results": data,
+                "autocomplete": self.get_autocomplete(),
             }
         )
 
     def get_paginated_response_schema(self, schema):
-        return {
+        final_schema = {
             "type": "object",
             "properties": {
                 "pagination": {"$ref": f"#/components/schemas/{PAGINATION_COMPONENT_NAME}"},
@@ -78,6 +96,12 @@ class Pagination(pagination.PageNumberPagination):
             },
             "required": ["pagination", "results"],
         }
+        if QLSearch in getattr(self.view, "filter_backends", []):
+            final_schema["properties"]["autocomplete"] = {
+                "$ref": f"#/components/schemas/{AUTOCOMPLETE_COMPONENT_NAME}"
+            }
+            final_schema["required"].append("autocomplete")
+        return final_schema
 
 
 class SmallerPagination(Pagination):
