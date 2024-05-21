@@ -5,10 +5,10 @@ from sys import exit as sysexit
 from time import sleep
 
 from psycopg import OperationalError, connect
-from redis import Redis
 from redis.exceptions import RedisError
 
-from authentik.lib.config import CONFIG, redis_url
+from authentik.lib.config import CONFIG
+from authentik.lib.utils.parser import parse_url
 
 
 def check_postgres():
@@ -34,13 +34,14 @@ def check_postgres():
 
 
 def check_redis():
-    url = CONFIG.get("cache.url") or redis_url(CONFIG.get("redis.db"))
+    url = CONFIG.get("redis.url")
     while True:
         try:
-            redis = Redis.from_url(url)
+            redis = parse_url(url)
             redis.ping()
             break
-        except RedisError as exc:
+        # Catch index error for Redis cluster that is still initializing
+        except (RedisError, IndexError) as exc:
             sleep(1)
             CONFIG.log("info", f"Redis Connection failed, retrying... ({exc})")
     CONFIG.log("info", "Redis Connection successful")
