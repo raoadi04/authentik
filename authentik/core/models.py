@@ -28,10 +28,12 @@ from authentik.lib.avatars import get_avatar
 from authentik.lib.generators import generate_id
 from authentik.lib.models import (
     CreatedUpdatedModel,
-    DomainlessFormattedURLValidator,
     SerializerModel,
+    SoftDeleteModel,
+    SoftDeleteQuerySet,
 )
 from authentik.lib.utils.time import timedelta_from_string
+from authentik.lib.validators import DomainlessFormattedURLValidator
 from authentik.policies.models import PolicyBindingModel
 from authentik.tenants.models import DEFAULT_TOKEN_DURATION, DEFAULT_TOKEN_LENGTH
 from authentik.tenants.utils import get_current_tenant, get_unique_identifier
@@ -96,7 +98,7 @@ class UserTypes(models.TextChoices):
     INTERNAL_SERVICE_ACCOUNT = "internal_service_account"
 
 
-class Group(SerializerModel):
+class Group(SoftDeleteModel, SerializerModel):
     """Group model which supports a basic hierarchy and has attributes"""
 
     group_uuid = models.UUIDField(primary_key=True, editable=False, default=uuid4)
@@ -186,31 +188,21 @@ class Group(SerializerModel):
         ]
 
 
-class UserQuerySet(models.QuerySet):
-    """User queryset"""
-
-    def exclude_anonymous(self):
-        """Exclude anonymous user"""
-        return self.exclude(**{User.USERNAME_FIELD: settings.ANONYMOUS_USER_NAME})
-
-
 class UserManager(DjangoUserManager):
     """User manager that doesn't assign is_superuser and is_staff"""
 
     def get_queryset(self):
         """Create special user queryset"""
-        return UserQuerySet(self.model, using=self._db)
+        return SoftDeleteQuerySet(self.model, using=self._db).exclude(
+            **{User.USERNAME_FIELD: settings.ANONYMOUS_USER_NAME}
+        )
 
     def create_user(self, username, email=None, password=None, **extra_fields):
         """User manager that doesn't assign is_superuser and is_staff"""
         return self._create_user(username, email, password, **extra_fields)
 
-    def exclude_anonymous(self) -> QuerySet:
-        """Exclude anonymous user"""
-        return self.get_queryset().exclude_anonymous()
 
-
-class User(SerializerModel, GuardianUserMixin, AbstractUser):
+class User(SoftDeleteModel, SerializerModel, GuardianUserMixin, AbstractUser):
     """authentik User model, based on django's contrib auth user model."""
 
     uuid = models.UUIDField(default=uuid4, editable=False, unique=True)

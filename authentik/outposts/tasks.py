@@ -129,17 +129,14 @@ def outpost_controller_all():
 
 
 @CELERY_APP.task(bind=True, base=SystemTask)
-def outpost_controller(
-    self: SystemTask, outpost_pk: str, action: str = "up", from_cache: bool = False
-):
+def outpost_controller(self: SystemTask, outpost_pk: str, action: str = "up"):
     """Create/update/monitor/delete the deployment of an Outpost"""
     logs = []
-    if from_cache:
-        outpost: Outpost = cache.get(CACHE_KEY_OUTPOST_DOWN % outpost_pk)
-        LOGGER.debug("Getting outpost from cache to delete")
-    else:
-        outpost: Outpost = Outpost.objects.filter(pk=outpost_pk).first()
-        LOGGER.debug("Getting outpost from DB")
+    outpost: Outpost = None
+    if action == "up":
+        outpost = Outpost.objects.filter(pk=outpost_pk).first()
+    elif action == "down":
+        outpost = Outpost.deleted.filter(pk=outpost_pk).first()
     if not outpost:
         LOGGER.warning("No outpost")
         return
@@ -155,9 +152,10 @@ def outpost_controller(
     except (ControllerException, ServiceConnectionInvalid) as exc:
         self.set_error(exc)
     else:
-        if from_cache:
-            cache.delete(CACHE_KEY_OUTPOST_DOWN % outpost_pk)
         self.set_status(TaskStatus.SUCCESSFUL, *logs)
+    finally:
+        if outpost.deleted_at:
+            outpost.force_delete()
 
 
 @CELERY_APP.task(bind=True, base=SystemTask)
