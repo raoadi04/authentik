@@ -7,7 +7,6 @@ from pathlib import Path
 
 import orjson
 from celery.schedules import crontab
-from django.conf import ImproperlyConfigured
 from sentry_sdk import set_tag
 
 from authentik import __version__
@@ -218,15 +217,7 @@ CACHES = {
 DJANGO_REDIS_SCAN_ITERSIZE = 1000
 DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
-match CONFIG.get("session_storage", "cache"):
-    case "cache":
-        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    case "db":
-        SESSION_ENGINE = "django.contrib.sessions.backends.db"
-    case _:
-        raise ImproperlyConfigured(
-            "Invalid session_storage setting, allowed values are db and cache"
-        )
+SESSION_ENGINE = "authentik.core.sessions"
 SESSION_SERIALIZER = "authentik.root.sessions.pickle.PickleSerializer"
 SESSION_CACHE_ALIAS = "default"
 # Configured via custom SessionMiddleware
