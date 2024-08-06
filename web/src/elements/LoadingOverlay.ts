@@ -6,8 +6,26 @@ import { customElement, property } from "lit/decorators.js";
 
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
 
+export interface ILoadingOverlay {
+    topMost?: boolean;
+}
+
+/**
+ * @class LoadingOverlay
+ * @element ak-loading-overlay
+ *
+ * The LoadingOverlay is meant to cover the container element completely, hiding the content behind
+ * a dimming filter, while content loads.
+ *
+ * @slot "body" - [Optional] message content to display while the overlay is visible.
+ */
 @customElement("ak-loading-overlay")
-export class LoadingOverlay extends AKElement {
+export class LoadingOverlay extends AKElement implements ILoadingOverlay {
+    /**
+     * When true, forces the overlay onto the top layer of the display stack.
+     *
+     * @attr
+     */
     @property({ type: Boolean })
     topMost = false;
 
