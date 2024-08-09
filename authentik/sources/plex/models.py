@@ -17,7 +17,11 @@ from authentik.core.models import (
     UserSourceConnection,
 )
 from authentik.core.types import UILoginButton, UserSettingSerializer
-from authentik.flows.challenge import Challenge, ChallengeResponse
+from authentik.flows.challenge import (
+    Challenge,
+    ChallengeResponse,
+    DiscriminatorField,
+)
 from authentik.lib.generators import generate_id
 
 
@@ -26,13 +30,13 @@ class PlexAuthenticationChallenge(Challenge):
 
     client_id = CharField()
     slug = CharField()
-    component = CharField(default="ak-source-plex")
+    component = DiscriminatorField("ak-source-plex")
 
 
 class PlexAuthenticationChallengeResponse(ChallengeResponse):
     """Pseudo class for plex response"""
 
-    component = CharField(default="ak-source-plex")
+    component = DiscriminatorField("ak-source-plex")
 
 
 class PlexSource(Source):

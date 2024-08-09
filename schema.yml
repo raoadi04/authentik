@@ -5842,9 +5842,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/GenericError'
           description: ''
-  /enterprise/license/get_install_id/:
+  /enterprise/license/install_id/:
     get:
-      operationId: enterprise_license_get_install_id_retrieve
+      operationId: enterprise_license_install_id_retrieve
       description: Get install_id
       tags:
       - enterprise
@@ -35565,6 +35565,10 @@ components:
       type: object
       description: Challenge when a flow's active stage calls `stage_invalid()`.
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -35576,13 +35580,10 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         error_message:
           type: string
       required:
+      - component
       - pending_user
       - pending_user_avatar
     AlgEnum:
@@ -35669,6 +35670,8 @@ components:
           type: string
           minLength: 1
           default: ak-source-oauth-apple
+      required:
+      - component
     AppleLoginChallenge:
       type: object
       description: Special challenge for apple-native authentication flow, which happens
@@ -35695,6 +35698,7 @@ components:
           type: string
       required:
       - client_id
+      - component
       - redirect_uri
       - scope
       - state
@@ -35968,6 +35972,10 @@ components:
       type: object
       description: Duo Challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -35979,10 +35987,6 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         activation_barcode:
           type: string
         activation_code:
@@ -35992,6 +35996,7 @@ components:
       required:
       - activation_barcode
       - activation_code
+      - component
       - pending_user
       - pending_user_avatar
       - stage_uuid
@@ -36003,6 +36008,8 @@ components:
           type: string
           minLength: 1
           default: ak-stage-authenticator-duo
+      required:
+      - component
     AuthenticatorDuoStage:
       type: object
       description: AuthenticatorDuoStage Serializer
@@ -36127,6 +36134,10 @@ components:
       type: object
       description: SMS Setup challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -36138,14 +36149,11 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         phone_number_required:
           type: boolean
           default: true
       required:
+      - component
       - pending_user
       - pending_user_avatar
     AuthenticatorSMSChallengeResponseRequest:
@@ -36161,6 +36169,8 @@ components:
         phone_number:
           type: string
           minLength: 1
+      required:
+      - component
     AuthenticatorSMSStage:
       type: object
       description: AuthenticatorSMSStage Serializer
@@ -36290,6 +36300,10 @@ components:
       type: object
       description: Static authenticator challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -36301,16 +36315,13 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         codes:
           type: array
           items:
             type: string
       required:
       - codes
+      - component
       - pending_user
       - pending_user_avatar
     AuthenticatorStaticChallengeResponseRequest:
@@ -36321,6 +36332,8 @@ components:
           type: string
           minLength: 1
           default: ak-stage-authenticator-static
+      required:
+      - component
     AuthenticatorStaticStage:
       type: object
       description: AuthenticatorStaticStage Serializer
@@ -36411,6 +36424,10 @@ components:
       type: object
       description: TOTP Setup challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -36422,13 +36439,10 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         config_url:
           type: string
       required:
+      - component
       - config_url
       - pending_user
       - pending_user_avatar
@@ -36444,6 +36458,7 @@ components:
           type: integer
       required:
       - code
+      - component
     AuthenticatorTOTPStage:
       type: object
       description: AuthenticatorTOTPStage Serializer
@@ -36638,6 +36653,10 @@ components:
       type: object
       description: Authenticator challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -36649,10 +36668,6 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         device_challenges:
           type: array
           items:
@@ -36662,6 +36677,7 @@ components:
           items:
             $ref: '#/components/schemas/SelectableStage'
       required:
+      - component
       - configuration_stages
       - device_challenges
       - pending_user
@@ -36687,10 +36703,16 @@ components:
           additionalProperties: {}
         duo:
           type: integer
+      required:
+      - component
     AuthenticatorWebAuthnChallenge:
       type: object
       description: WebAuthn Challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -36702,14 +36724,11 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         registration:
           type: object
           additionalProperties: {}
       required:
+      - component
       - pending_user
       - pending_user_avatar
       - registration
@@ -36725,6 +36744,7 @@ components:
           type: object
           additionalProperties: {}
       required:
+      - component
       - response
     AuthenticatorWebAuthnStage:
       type: object
@@ -36836,6 +36856,8 @@ components:
           type: string
           minLength: 1
           default: ak-stage-autosubmit
+      required:
+      - component
     AutosubmitChallenge:
       type: object
       description: Autosubmit challenge used to send and navigate a POST request
@@ -36861,6 +36883,7 @@ components:
           type: string
       required:
       - attrs
+      - component
       - url
     BackendsEnum:
       enum:
@@ -37102,6 +37125,10 @@ components:
       type: object
       description: Site public key
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -37113,15 +37140,12 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         site_key:
           type: string
         js_url:
           type: string
       required:
+      - component
       - js_url
       - pending_user
       - pending_user_avatar
@@ -37138,6 +37162,7 @@ components:
           type: string
           minLength: 1
       required:
+      - component
       - token
     CaptchaStage:
       type: object
@@ -37488,6 +37513,10 @@ components:
       type: object
       description: Challenge info for consent screens
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -37499,10 +37528,6 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         header_text:
           type: string
         permissions:
@@ -37517,6 +37542,7 @@ components:
           type: string
       required:
       - additional_permissions
+      - component
       - pending_user
       - pending_user_avatar
       - permissions
@@ -37533,6 +37559,7 @@ components:
           type: string
           minLength: 1
       required:
+      - component
       - token
     ConsentPermission:
       type: object
@@ -38282,6 +38309,7 @@ components:
         name:
           type: string
       required:
+      - component
       - name
     DummyChallengeResponseRequest:
       type: object
@@ -38291,6 +38319,8 @@ components:
           type: string
           minLength: 1
           default: ak-stage-dummy
+      required:
+      - component
     DummyPolicy:
       type: object
       description: Dummy Policy Serializer
@@ -38476,6 +38506,8 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
+      required:
+      - component
     EmailChallengeResponseRequest:
       type: object
       description: |-
@@ -38486,6 +38518,8 @@ components:
           type: string
           minLength: 1
           default: ak-stage-email
+      required:
+      - component
     EmailStage:
       type: object
       description: EmailStage Serializer
@@ -39333,6 +39367,7 @@ components:
         traceback:
           type: string
       required:
+      - component
       - request_id
     FlowImportResult:
       type: object
@@ -40313,6 +40348,7 @@ components:
         show_source_labels:
           type: boolean
       required:
+      - component
       - flow_designation
       - password_fields
       - primary_action
@@ -40333,6 +40369,7 @@ components:
           type: string
           nullable: true
       required:
+      - component
       - uid_field
     IdentificationStage:
       type: object
@@ -42346,6 +42383,8 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
+      required:
+      - component
     OAuthDeviceCodeChallengeResponseRequest:
       type: object
       description: Response that includes the user-entered device code
@@ -42358,6 +42397,7 @@ components:
           type: integer
       required:
       - code
+      - component
     OAuthDeviceCodeFinishChallenge:
       type: object
       description: Final challenge after user enters their code
@@ -42373,6 +42413,8 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
+      required:
+      - component
     OAuthDeviceCodeFinishChallengeResponseRequest:
       type: object
       description: Response that device has been authenticated and tab can be closed
@@ -42381,6 +42423,8 @@ components:
           type: string
           minLength: 1
           default: ak-provider-oauth2-device-code-finish
+      required:
+      - component
     OAuthSource:
       type: object
       description: OAuth Source Serializer
@@ -44368,6 +44412,10 @@ components:
       type: object
       description: Password challenge UI fields
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -44379,16 +44427,13 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
         recovery_url:
           type: string
         allow_show_password:
           type: boolean
           default: false
       required:
+      - component
       - pending_user
       - pending_user_avatar
     PasswordChallengeResponseRequest:
@@ -44403,6 +44448,7 @@ components:
           type: string
           minLength: 1
       required:
+      - component
       - password
     PasswordExpiryPolicy:
       type: object
@@ -47505,6 +47551,7 @@ components:
           type: string
       required:
       - client_id
+      - component
       - slug
     PlexAuthenticationChallengeResponseRequest:
       type: object
@@ -47514,6 +47561,8 @@ components:
           type: string
           minLength: 1
           default: ak-source-plex
+      required:
+      - component
     PlexSource:
       type: object
       description: Plex Source Serializer
@@ -48029,6 +48078,7 @@ components:
           items:
             $ref: '#/components/schemas/StagePrompt'
       required:
+      - component
       - fields
     PromptChallengeResponseRequest:
       type: object
@@ -48040,6 +48090,8 @@ components:
           type: string
           minLength: 1
           default: ak-stage-prompt
+      required:
+      - component
       additionalProperties: {}
     PromptRequest:
       type: object
@@ -49182,6 +49234,7 @@ components:
         to:
           type: string
       required:
+      - component
       - to
     Reputation:
       type: object
@@ -50868,6 +50921,7 @@ components:
           type: string
       required:
       - body
+      - component
     SignatureAlgorithmEnum:
       enum:
       - http://www.w3.org/2000/09/xmldsig#rsa-sha1
@@ -52006,6 +52060,10 @@ components:
       type: object
       description: Empty challenge
       properties:
+        pending_user:
+          type: string
+        pending_user_avatar:
+          type: string
         flow_info:
           $ref: '#/components/schemas/ContextualFlowInfo'
         component:
@@ -52017,11 +52075,8 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ErrorDetail'
-        pending_user:
-          type: string
-        pending_user_avatar:
-          type: string
       required:
+      - component
       - pending_user
       - pending_user_avatar
     UserLoginChallengeResponseRequest:
@@ -52035,6 +52090,7 @@ components:
         remember_me:
           type: boolean
       required:
+      - component
       - remember_me
     UserLoginStage:
       type: object
