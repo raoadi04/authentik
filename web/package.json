@@ -248,6 +248,7 @@
         },
         "lint:components": {
             "command": "lit-analyzer src"
+
         },
         "lint:types": {
             "command": "tsc --noEmit -p .",
