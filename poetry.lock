@@ -4652,13 +4652,13 @@ wsproto = ">=0.14"
 
 [[package]]
 name = "twilio"
-version = "9.2.3"
+version = "9.3.5"
 description = "Twilio API client and TwiML generator"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "twilio-9.2.3-py2.py3-none-any.whl", hash = "sha256:76bfc39aa8d854510907cb7f9465814dfdea9e91ec199bb44f0785f05746f4cc"},
-    {file = "twilio-9.2.3.tar.gz", hash = "sha256:da2255b5f3753cb3bf647fc6c50edbdb367ebc3cde6802806f6f863058a65f75"},
+    {file = "twilio-9.3.5-py2.py3-none-any.whl", hash = "sha256:d6a97a77b98cc176a61c960f11894af385bc1c11b93e2e8b79fdfb9601788fb0"},
+    {file = "twilio-9.3.5.tar.gz", hash = "sha256:608d78a903d403465aac1840c58a6546a090b7e222d2bf539a93c3831072880c"},
 ]
 
 [package.dependencies]
