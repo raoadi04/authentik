@@ -28,7 +28,7 @@
         "disqus-react": "^1.1.5",
         "docusaurus-plugin-openapi-docs": "^3.0.2",
         "docusaurus-theme-openapi-docs": "^3.0.2",
-        "postcss": "^8.4.41",
+        "postcss": "^8.4.48",
         "prism-react-renderer": "^2.3.1",
         "react": "^18.3.1",
         "react-before-after-slider-component": "^1.1.8",
